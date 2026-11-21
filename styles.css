@@ -421,10 +421,22 @@ button {
   position: relative;
 }
 
+.field .select-wrap select,
 .select-wrap select {
+  -webkit-appearance: none;
   appearance: none;
   padding-inline-end: 34px;
   cursor: pointer;
+}
+
+.select-wrap select::picker-icon {
+  display: none;
+  content: none;
+}
+
+.select-wrap select::-ms-expand {
+  display: none;
+  content: none;
 }
 
 .select-wrap::after {
