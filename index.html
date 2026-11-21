@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5f1e8">
+  <meta name="description" content="免费、开源、纯前端的创作者商单报价计算器，支持曝光估值、制作工时、商业授权附加费、CPA/CPS 结算测算与对外防窥报价单。">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='3' fill='%23161513'/%3E%3Crect x='2.5' y='2.5' width='27' height='27' rx='1.5' fill='none' stroke='%23c9361e' stroke-width='1.5'/%3E%3Ctext x='16' y='21.5' text-anchor='middle' font-family='Georgia,serif' font-size='14' font-weight='700' fill='%23f5f1e8'%3ECR%3C/text%3E%3C/svg%3E">
+  <title>商单报价计算器｜Creator Rate Lab</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link visually-hidden">跳转到主要内容</a>
+
+  <div class="page">
+    <header class="masthead">
+      <div class="masthead-brand">
+        <span class="brand-wordmark" lang="en">CREATOR RATE LAB</span>
+        <span class="brand-cn">创作者商单报价器</span>
+      </div>
+ 
+      <div class="masthead-control">
+        <label class="privacy-switch" for="hideFloor">
+          <input id="hideFloor" name="hideFloor" type="checkbox" role="switch" aria-describedby="hideFloorHint">
+          <span class="switch-track" aria-hidden="true"></span>
+          <span class="switch-label">对外报价模式</span>
+        </label>
+        <span id="hideFloorHint" class="visually-hidden">开启后将隐藏报价单中的目标成交价、内部底价与成本构成拆解，便于直接截图或导出发给品牌方。</span>
+      </div>
+    </header>
+
+    <main id="main-content" class="workspace">
+      <div class="editor-column">
+        <section class="hero" aria-labelledby="page-title">
+          <h1 id="page-title" tabindex="-1">你的内容，值多少钱？</h1>
+          <p class="hero-lead">别只看粉丝数。把平均原创曝光、实际制作工时、受众匹配和商业授权拆开算，生成一张自己能解释清楚的报价单。<span class="hero-note-inline">（自设参数模型，非行业统一价目表）</span></p>
+        </section>
+
+        <form id="calculatorForm" class="worksheet" aria-label="商单报价参数设置" novalidate>
+        <!-- 01 账号与流量 -->
+        <fieldset class="sheet-section">
+          <legend class="section-head">
+            <span class="section-index mono">01</span>
+            <span class="section-title">账号与流量</span>
+            <span class="section-desc">取最近 10–20 条普通原创均值，避开单条爆款</span>
+          </legend>
+
+          <div class="traffic-top">
+            <div class="field">
+              <label for="platform">发布平台</label>
+              <div class="select-wrap">
+                <select id="platform" name="platform">
+                  <option value="X / Twitter" selected>X / Twitter</option>
+                  <option value="小红书">小红书</option>
+                  <option value="哔哩哔哩">哔哩哔哩</option>
+                  <option value="抖音">抖音</option>
+                  <option value="YouTube">YouTube</option>
+                  <option value="其他">其他</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="preset-group">
+              <span class="preset-label" id="presetLabel">快捷示例预设</span>
+              <div class="preset-bar" role="group" aria-labelledby="presetLabel">
+                <button type="button" class="preset-btn is-active" data-preset="starter" data-followers="5500" data-impressions="10000" aria-pressed="true">5,500粉 · 1万曝光</button>
+                <button type="button" class="preset-btn" data-preset="growing" data-followers="10000" data-impressions="20000" aria-pressed="false">1万粉 · 2万曝光</button>
+                <button type="button" class="preset-btn" data-preset="mid" data-followers="30000" data-impressions="50000" aria-pressed="false">3万粉 · 5万曝光</button>
+                <button type="button" class="preset-btn" data-preset="top" data-followers="100000" data-impressions="150000" aria-pressed="false">10万粉 · 15万曝光</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="traffic-sliders">
+            <div class="slider-field traffic-slider-card">
+              <div class="slider-top">
+                <label for="followers">粉丝数量</label>
+                <input id="followers" name="followers" class="slider-num-input mono" type="number" inputmode="numeric" value="5500" min="0" max="1000000000" step="100">
+              </div>
+              <input id="followersRange" type="range" min="0" max="1000" step="1" value="165" aria-label="拖动调整粉丝数量" aria-valuetext="5,500">
+              <div class="range-scale mono" aria-hidden="true">
+                <div class="range-scale-track">
+                  <span class="tick tick-start" style="--pos: 0%">0</span>
+                  <span class="tick" style="--pos: 30%">1万</span>
+                  <span class="tick" style="--pos: 65%">5万</span>
+                  <span class="tick tick-end" style="--pos: 100%">20万</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="slider-field traffic-slider-card">
+              <div class="slider-top">
+                <label for="impressions">平均原创曝光 / 篇</label>
+                <input id="impressions" name="impressions" class="slider-num-input mono" type="number" inputmode="numeric" value="10000" min="0" max="1000000000" step="100">
+              </div>
+              <input id="impressionsRange" type="range" min="0" max="1000" step="1" value="200" aria-label="拖动调整平均原创曝光" aria-valuetext="10,000">
+              <div class="range-scale mono" aria-hidden="true">
+                <div class="range-scale-track">
+                  <span class="tick tick-start" style="--pos: 0%">0</span>
+                  <span class="tick" style="--pos: 30%">1.5万</span>
+                  <span class="tick" style="--pos: 65%">8万</span>
+                  <span class="tick tick-end" style="--pos: 100%">30万</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 02 内容与制作工时 -->
+        <fieldset class="sheet-section">
+          <legend class="section-head">
+            <span class="section-index mono">02</span>
+            <span class="section-title">制作工时</span>
+            <span class="section-desc">基础工时不重复包含下方勾选的额外工序</span>
+          </legend>
+
+          <div class="field-grid cols-3">
+            <div class="field">
+              <label for="format">内容类型</label>
+              <div class="select-wrap">
+                <select id="format" name="format">
+                  <option value="post">普通原创图文</option>
+                  <option value="article">品牌介绍长文</option>
+                  <option value="review" selected>实测教程长文</option>
+                  <option value="thread">Thread 连续推文</option>
+                  <option value="bundle">长文 + 推广帖套餐</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="baseHours">策划与写作基础工时</label>
+              <div class="unit-input">
+                <input id="baseHours" name="baseHours" type="number" inputmode="decimal" value="3.5" min="0" max="500" step="0.5">
+                <span class="unit-suffix mono" aria-hidden="true">h</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="hourlyRate">时薪标准</label>
+              <div class="unit-input">
+                <input id="hourlyRate" name="hourlyRate" type="number" inputmode="numeric" value="100" min="0" max="100000" step="10">
+                <span class="unit-suffix mono" aria-hidden="true">¥/h</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sub-group">
+            <span class="sub-label" id="tasksLabel">额外工序（勾选自动累加总工时）</span>
+            <div class="chip-grid" role="group" aria-labelledby="tasksLabel">
+              <label class="task-chip" for="testing">
+                <input id="testing" name="testing" type="checkbox" checked>
+                <span class="chip-box" aria-hidden="true"></span>
+                <span class="chip-text">
+                  <strong>实际体验测试</strong>
+                  <small class="mono">+1.5h</small>
+                </span>
+              </label>
+
+              <label class="task-chip" for="recording">
+                <input id="recording" name="recording" type="checkbox" checked>
+                <span class="chip-box" aria-hidden="true"></span>
+                <span class="chip-text">
+                  <strong>录屏与截图</strong>
+                  <small class="mono">+1.0h</small>
+                </span>
+              </label>
+
+              <label class="task-chip" for="visuals">
+                <input id="visuals" name="visuals" type="checkbox" checked>
+                <span class="chip-box" aria-hidden="true"></span>
+                <span class="chip-text">
+                  <strong>原创封面配图</strong>
+                  <small class="mono">+1.0h</small>
+                </span>
+              </label>
+
+              <label class="task-chip" for="editing">
+                <input id="editing" name="editing" type="checkbox">
+                <span class="chip-box" aria-hidden="true"></span>
+                <span class="chip-text">
+                  <strong>视频剪辑</strong>
+                  <small class="mono">+2.0h</small>
+                </span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 03 曝光假设与商业授权 -->
+        <fieldset class="sheet-section">
+          <legend class="section-head">
+            <span class="section-index mono">03</span>
+            <span class="section-title">曝光与授权</span>
+            <span class="section-desc">发布一次不等于品牌可无限期二次投放</span>
+          </legend>
+
+          <div class="split-controls">
+            <div class="sliders-col">
+              <div class="slider-field">
+                <div class="slider-top">
+                  <label for="postFactor">商业帖曝光系数</label>
+                  <output id="postFactorText" for="postFactor" class="slider-readout mono">80%</output>
+                </div>
+                <input id="postFactor" name="postFactor" type="range" min="30" max="120" step="5" value="80" aria-describedby="postFactorHelp">
+                <span id="postFactorHelp" class="field-hint">商单帖曝光通常略低于普通原创均值</span>
+              </div>
+
+              <div class="slider-field">
+                <div class="slider-top">
+                  <label for="fitFactor">受众匹配系数</label>
+                  <output id="fitFactorText" for="fitFactor" class="slider-readout mono">100%</output>
+                </div>
+                <input id="fitFactor" name="fitFactor" type="range" min="40" max="160" step="5" value="100" aria-describedby="fitFactorHelp">
+                <span id="fitFactorHelp" class="field-hint">受众垂类相关性、地区与消费意愿加权</span>
+              </div>
+
+              <div class="field inline-cpm">
+                <label for="cpm">自定义 CPM（每千次曝光估值）</label>
+                <div class="unit-input">
+                  <input id="cpm" name="cpm" type="number" inputmode="numeric" value="40" min="0" max="10000" step="5">
+                  <span class="unit-suffix mono" aria-hidden="true">¥/千次</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rights-col" role="group" aria-label="商业授权与加急附加项">
+              <label class="right-item" for="paidUsage">
+                <input id="paidUsage" name="paidUsage" type="checkbox">
+                <span class="right-box" aria-hidden="true"></span>
+                <span class="right-body">
+                  <span class="right-title">付费广告二次使用 <em id="paidUsageTag" class="mono">+30%</em></span>
+                  <small>允许品牌拿去信息流投流或素材切片</small>
+                </span>
+              </label>
+
+              <label class="right-item" for="exclusive">
+                <input id="exclusive" name="exclusive" type="checkbox">
+                <span class="right-box" aria-hidden="true"></span>
+                <span class="right-body">
+                  <span class="right-title">竞品排他期 <em id="exclusiveTag" class="mono">+20%</em></span>
+                  <small>约定周期内不接同类竞品商单</small>
+                </span>
+              </label>
+
+              <label class="right-item" for="rush">
+                <input id="rush" name="rush" type="checkbox">
+                <span class="right-box" aria-hidden="true"></span>
+                <span class="right-body">
+                  <span class="right-title">加急交付 <em id="rushTag" class="mono">+15%</em></span>
+                  <small>压缩常规测试、排期与制作周期</small>
+                </span>
+              </label>
+
+              <label class="right-item" for="pin">
+                <input id="pin" name="pin" type="checkbox">
+                <span class="right-box" aria-hidden="true"></span>
+                <span class="right-body">
+                  <span class="right-title">置顶 / 延长保留 <em id="pinTag" class="mono">+¥150</em></span>
+                  <small>主页置顶位或超期保留附加费</small>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <details class="advanced-drawer" id="advancedDrawer">
+            <summary>
+              <span class="summary-title">高级参数与谈判系数微调</span>
+              <span class="summary-meta mono" id="advancedSummary">溢价 +18% · 底价 -20% · 改稿 0 轮</span>
+            </summary>
+            <div class="advanced-body">
+              <div class="field-grid cols-3">
+                <div class="field">
+                  <label for="engagement">平均互动率（仅记录）</label>
+                  <div class="unit-input">
+                    <input id="engagement" name="engagement" type="number" inputmode="decimal" value="3.5" min="0" max="100" step="0.1">
+                    <span class="unit-suffix mono" aria-hidden="true">%</span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="directCost">直接成本（道具/会员）</label>
+                  <div class="unit-input">
+                    <input id="directCost" name="directCost" type="number" inputmode="numeric" value="0" min="0" max="1000000" step="10">
+                    <span class="unit-suffix mono" aria-hidden="true">¥</span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="revisions">额外修改轮数</label>
+                  <input id="revisions" name="revisions" type="number" inputmode="numeric" value="0" min="0" max="20" step="1">
+                </div>
+
+                <div class="field">
+                  <label for="revisionFee">每轮额外修改费</label>
+                  <div class="unit-input">
+                    <input id="revisionFee" name="revisionFee" type="number" inputmode="numeric" value="100" min="0" max="100000" step="20">
+                    <span class="unit-suffix mono" aria-hidden="true">¥</span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="paidUsagePct">二次使用加价比例</label>
+                  <div class="unit-input">
+                    <input id="paidUsagePct" name="paidUsagePct" type="number" inputmode="numeric" value="30" min="0" max="200" step="5">
+                    <span class="unit-suffix mono" aria-hidden="true">%</span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="exclusivePct">竞品排他加价比例</label>
+                  <div class="unit-input">
+                    <input id="exclusivePct" name="exclusivePct" type="number" inputmode="numeric" value="20" min="0" max="200" step="5">
+                    <span class="unit-suffix mono" aria-hidden="true">%</span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="rushPct">加急交付加价比例</label>
+                  <div class="unit-input">
+                    <input id="rushPct" name="rushPct" type="number" inputmode="numeric" value="15" min="0" max="200" step="5">
+                    <span class="unit-suffix mono" aria-hidden="true">%</span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="pinFee">置顶附加费</label>
+                  <div class="unit-input">
+                    <input id="pinFee" name="pinFee" type="number" inputmode="numeric" value="150" min="0" max="100000" step="50">
+                    <span class="unit-suffix mono" aria-hidden="true">¥</span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="premium">对外开价溢价幅度</label>
+                  <div class="unit-input">
+                    <input id="premium" name="premium" type="number" inputmode="numeric" value="18" min="0" max="100" step="1">
+                    <span class="unit-suffix mono" aria-hidden="true">%</span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="discount">内部底价折让幅度</label>
+                  <div class="unit-input">
+                    <input id="discount" name="discount" type="number" inputmode="numeric" value="20" min="0" max="80" step="1">
+                    <span class="unit-suffix mono" aria-hidden="true">%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </fieldset>
+
+        <!-- 04 结算方式 -->
+        <fieldset class="sheet-section">
+          <legend class="section-head">
+            <span class="section-index mono">04</span>
+            <span class="section-title">结算方式</span>
+            <span class="section-desc">“固定 500 元一篇”是固定稿酬，不等于 CPA</span>
+          </legend>
+
+          <div class="mode-grid">
+            <label class="mode-card" for="modeFixed">
+              <input id="modeFixed" type="radio" name="payMode" value="fixed" checked>
+              <span class="mode-dot" aria-hidden="true"></span>
+              <span class="mode-copy">
+                <strong>固定稿酬</strong>
+                <small>按约定内容交付与发布支付固定费用</small>
+              </span>
+            </label>
+
+            <label class="mode-card" for="modeHybrid">
+              <input id="modeHybrid" type="radio" name="payMode" value="hybrid">
+              <span class="mode-dot" aria-hidden="true"></span>
+              <span class="mode-copy">
+                <strong>固定 + 佣金</strong>
+                <small>基础稿酬保底 + 有效转化分成</small>
+              </span>
+            </label>
+
+            <label class="mode-card" for="modePerformance">
+              <input id="modePerformance" type="radio" name="payMode" value="performance">
+              <span class="mode-dot" aria-hidden="true"></span>
+              <span class="mode-copy">
+                <strong>纯效果佣金</strong>
+                <small>仅按 CPA / CPS 实际结果结算</small>
+              </span>
+            </label>
+          </div>
+
+          <div id="commissionInputs" class="commission-drawer" hidden>
+            <div class="field-grid cols-2">
+              <div class="field">
+                <label for="commissionType">效果佣金类型</label>
+                <div class="select-wrap">
+                  <select id="commissionType" name="commissionType">
+                    <option value="cpa">CPA / 有效行为佣金</option>
+                    <option value="cps">CPS / 成交金额分成</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label id="commissionValueLabel" for="commissionValue">每次有效行为佣金</label>
+                <div class="unit-input">
+                  <input id="commissionValue" name="commissionValue" type="number" inputmode="decimal" value="100" min="0" max="1000000" step="5">
+                  <span id="commissionUnit" class="unit-suffix mono" aria-hidden="true">¥</span>
+                </div>
+              </div>
+
+              <div class="field" id="orderValueWrapper" hidden>
+                <label for="orderValue">每笔平均成交金额</label>
+                <div class="unit-input">
+                  <input id="orderValue" name="orderValue" type="number" inputmode="numeric" value="1000" min="0" max="10000000" step="50">
+                  <span class="unit-suffix mono" aria-hidden="true">¥</span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="conversions">预估有效转化人数</label>
+                <input id="conversions" name="conversions" type="number" inputmode="numeric" value="3" min="0" max="1000000" step="1">
+              </div>
+
+              <div class="field" id="fixedFeeWrapper">
+                <label for="fixedFee">品牌承诺的固定稿酬</label>
+                <div class="unit-input">
+                  <input id="fixedFee" name="fixedFee" type="number" inputmode="numeric" value="800" min="0" max="10000000" step="50">
+                  <span class="unit-suffix mono" aria-hidden="true">¥</span>
+                </div>
+              </div>
+            </div>
+            <p class="commission-tip">效果收入仅为情景估算。签约前请书面确认有效转化定义、归因后台、归因窗口、退款扣回及结算账期。</p>
+          </div>
+        </fieldset>
+
+        <div class="worksheet-actions">
+          <button id="reset" type="button" class="btn btn-ghost">恢复默认参数</button>
+          <button id="copyInternal" type="button" class="btn btn-outline">复制内部完整测算</button>
+        </div>
+      </form>
+      </div>
+
+      <!-- 右侧实体热敏小票 / 工作室报价单 -->
+      <aside id="receiptPanel" class="receipt-wrap" aria-label="报价参考单">
+        <article class="receipt" id="receiptCard">
+          <header class="receipt-head">
+            <h2 class="receipt-title">
+              <span lang="en">STUDIO QUOTATION</span>
+              <span class="slash" aria-hidden="true">/</span>
+              <span>报价参考单</span>
+            </h2>
+            <dl class="receipt-meta mono">
+              <div class="meta-row">
+                <dt>PROJECT</dt>
+                <dd id="receiptProject">实测教程长文</dd>
+              </div>
+              <div class="meta-row">
+                <dt>DATE</dt>
+                <dd id="receiptDate">2026-11-20</dd>
+              </div>
+              <div class="meta-row">
+                <dt>PLATFORM</dt>
+                <dd id="receiptPlatform">X / Twitter</dd>
+              </div>
+              <div class="meta-row">
+                <dt>NO.</dt>
+                <dd id="receiptCode">Q-2026-0043</dd>
+              </div>
+            </dl>
+          </header>
+
+          <hr class="rule-solid">
+
+          <section class="receipt-hero" aria-label="建议报价结果">
+            <div class="opening-block">
+              <span id="openingLabel" class="opening-label">建议对外开价</span>
+              <strong id="opening" class="opening-price mono">¥1,200</strong>
+            </div>
+            <div class="rubber-stamp mono" id="receiptStamp" aria-hidden="true">ESTIMATE</div>
+          </section>
+
+          <hr class="rule-dotted internal-only">
+
+          <div class="tier-grid internal-only">
+            <div class="tier-box">
+              <span class="tier-label">目标成交价</span>
+              <strong id="target" class="tier-value mono">¥1,000</strong>
+            </div>
+
+            <div class="tier-box tier-private" id="floorBox">
+              <span class="tier-label" id="floorLabel">内部底价（勿对外）</span>
+              <strong id="floor" class="tier-value mono">¥800</strong>
+            </div>
+          </div>
+
+          <section class="mix-section internal-only" aria-labelledby="mixHeading">
+            <div class="mix-head">
+              <h3 id="mixHeading">成本结构（占基础估值）</h3>
+              <ul class="mix-legend mono" role="list">
+                <li><i class="swatch swatch-prod" aria-hidden="true"></i>制作 <span id="prodPct">69%</span></li>
+                <li><i class="swatch swatch-media" aria-hidden="true"></i>流量 <span id="mediaPct">31%</span></li>
+                <li><i class="swatch swatch-rights" aria-hidden="true"></i>授权 <span id="rightsPct">0%</span></li>
+              </ul>
+            </div>
+            <div class="mix-bar" role="img" id="mixBar" aria-label="报价构成比例：制作成本 69%，流量估值 31%，授权费用 0%">
+              <span class="bar-seg seg-prod" id="barProd" style="width: 69%">69%</span>
+              <span class="bar-seg seg-media" id="barMedia" style="width: 31%">31%</span>
+              <span class="bar-seg seg-rights" id="barRights" style="width: 0%"></span>
+            </div>
+          </section>
+
+          <hr class="rule-dotted">
+
+          <dl class="ledger">
+            <div class="ledger-row">
+              <dt>预计商业帖曝光</dt>
+              <span class="leader" aria-hidden="true"></span>
+              <dd id="expectedReach" class="mono">8,000</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>原创曝光 / 粉丝比</dt>
+              <span class="leader" aria-hidden="true"></span>
+              <dd id="reachRatio" class="mono">182%</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>制作总工时</dt>
+              <span class="leader" aria-hidden="true"></span>
+              <dd id="totalHours" class="mono">7.0 h</dd>
+            </div>
+            <div class="ledger-row client-only" id="clientRightsRow">
+              <dt>包含附加权益</dt>
+              <span class="leader" aria-hidden="true"></span>
+              <dd id="clientRightsValue">基础自然发布</dd>
+            </div>
+          </dl>
+
+          <hr class="rule-dotted internal-only">
+
+          <dl class="ledger internal-only" id="internalCostLedger">
+            <div class="ledger-row">
+              <dt>发布流量估值</dt>
+              <span class="leader" aria-hidden="true"></span>
+              <dd id="mediaCost" class="mono">¥320</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>内容制作成本<small id="directCostBadge" class="inline-sub mono" hidden></small></dt>
+              <span class="leader" aria-hidden="true"></span>
+              <dd id="productionCost" class="mono">¥700</dd>
+            </div>
+            <div class="ledger-row">
+              <dt>授权及额外费用</dt>
+              <span class="leader" aria-hidden="true"></span>
+              <dd id="rightsCost" class="mono">¥0</dd>
+            </div>
+            <div class="ledger-row ledger-total">
+              <dt>模型基础估值</dt>
+              <span class="leader" aria-hidden="true"></span>
+              <dd id="baseEstimate" class="mono">¥1,020</dd>
+            </div>
+          </dl>
+
+          <section class="settlement-box" aria-label="结算方式测算">
+            <div class="settlement-top">
+              <span id="modeLabel" class="settlement-label">建议固定稿酬</span>
+              <strong id="expectedIncome" class="settlement-val mono">¥1,000</strong>
+            </div>
+            <p id="modeNote" class="settlement-note">固定费用建议与交付内容、修改次数、付款时间和授权范围分开约定。</p>
+            <p id="performanceAlert" class="performance-alert" role="note" hidden>
+              纯 CPA / CPS 没有保底收入。即使内容获得曝光，也可能没有符合品牌定义的有效转化。
+            </p>
+          </section>
+
+          <div class="barcode-block" aria-hidden="true">
+            <svg class="barcode-svg" viewBox="0 0 264 38" preserveAspectRatio="none">
+              <rect x="0" y="0" width="3" height="38"/>
+              <rect x="5" y="0" width="1.5" height="38"/>
+              <rect x="9" y="0" width="4" height="38"/>
+              <rect x="16" y="0" width="2" height="38"/>
+              <rect x="21" y="0" width="1.5" height="38"/>
+              <rect x="25" y="0" width="3" height="38"/>
+              <rect x="31" y="0" width="5" height="38"/>
+              <rect x="39" y="0" width="1.5" height="38"/>
+              <rect x="43" y="0" width="2.5" height="38"/>
+              <rect x="48" y="0" width="4" height="38"/>
+              <rect x="55" y="0" width="1.5" height="38"/>
+              <rect x="59" y="0" width="2" height="38"/>
+              <rect x="64" y="0" width="3.5" height="38"/>
+              <rect x="70" y="0" width="1.5" height="38"/>
+              <rect x="75" y="0" width="4.5" height="38"/>
+              <rect x="82" y="0" width="2" height="38"/>
+              <rect x="87" y="0" width="1.5" height="38"/>
+              <rect x="91" y="0" width="3" height="38"/>
+              <rect x="97" y="0" width="2" height="38"/>
+              <rect x="102" y="0" width="5" height="38"/>
+              <rect x="110" y="0" width="1.5" height="38"/>
+              <rect x="114" y="0" width="3" height="38"/>
+              <rect x="120" y="0" width="2" height="38"/>
+              <rect x="125" y="0" width="4" height="38"/>
+              <rect x="132" y="0" width="1.5" height="38"/>
+              <rect x="136" y="0" width="2.5" height="38"/>
+              <rect x="141" y="0" width="4" height="38"/>
+              <rect x="148" y="0" width="1.5" height="38"/>
+              <rect x="152" y="0" width="3.5" height="38"/>
+              <rect x="158" y="0" width="2" height="38"/>
+              <rect x="163" y="0" width="5" height="38"/>
+              <rect x="171" y="0" width="1.5" height="38"/>
+              <rect x="175" y="0" width="2.5" height="38"/>
+              <rect x="180" y="0" width="4" height="38"/>
+              <rect x="187" y="0" width="2" height="38"/>
+              <rect x="192" y="0" width="1.5" height="38"/>
+              <rect x="196" y="0" width="3.5" height="38"/>
+              <rect x="202" y="0" width="4.5" height="38"/>
+              <rect x="209" y="0" width="1.5" height="38"/>
+              <rect x="213" y="0" width="2" height="38"/>
+              <rect x="218" y="0" width="4" height="38"/>
+              <rect x="225" y="0" width="1.5" height="38"/>
+              <rect x="229" y="0" width="3" height="38"/>
+              <rect x="235" y="0" width="2" height="38"/>
+              <rect x="240" y="0" width="5" height="38"/>
+              <rect x="248" y="0" width="2" height="38"/>
+              <rect x="253" y="0" width="1.5" height="38"/>
+              <rect x="257" y="0" width="3.5" height="38"/>
+              <rect x="262" y="0" width="2" height="38"/>
+            </svg>
+            <span id="barcodeCode" class="barcode-code mono">Q-2026-0043</span>
+          </div>
+
+          <div class="receipt-actions">
+            <button id="copyPublic" type="button" class="btn btn-ink">复制对外报价文案</button>
+            <button id="print" type="button" class="btn btn-outline">打印 / 导出 PDF</button>
+          </div>
+
+          <p class="receipt-footnote">默认 CPM、时薪和授权比例仅供示例，并非统一市场行情。模型不保证成交、曝光或转化。</p>
+        </article>
+      </aside>
+    </main>
+
+    <!-- 常见问题手风琴 -->
+    <section class="faq-section" aria-labelledby="faqHeading">
+      <div class="faq-header">
+        <span class="section-index mono">FAQ</span>
+        <h2 id="faqHeading">常见问题与公式口径</h2>
+      </div>
+      <div class="faq-list">
+        <details>
+          <summary>报价的计算公式是什么？</summary>
+          <div class="faq-content">
+            <p>预计商业帖曝光 = 平均原创曝光 × 商业帖曝光系数；发布流量估值 = 预计曝光 ÷ 1000 × 自设 CPM × 受众匹配系数；人工制作费 = 总工时 × 时薪 + 额外修改费；内容制作成本 = 人工制作费 + 直接成本；授权及额外费用 = (发布流量估值 + 人工制作费) × 授权/排他/加急比例 + 置顶费用（代垫的直接成本按实报实销计入总价，不参与比例加价）；基础估值 = 发布流量估值 + 内容制作成本 + 授权费用。对外开价、目标成交价和内部底价按谈判溢价与折让计算，300 元及以上按 50 元档位取整，300 元以下小额合作按 10 元档位取整。</p>
+          </div>
+        </details>
+        <details>
+          <summary>为什么粉丝数不直接乘单价？</summary>
+          <div class="faq-content">
+            <p>粉丝数仅体现历史规模，并不直接等于实际触达和购买意愿。工具以平均原创曝光、受众匹配以及实际制作工时为核心维度，同时保留曝光/粉丝比作为账号活跃度参考。</p>
+          </div>
+        </details>
+        <details>
+          <summary>CPA、CPS、固定稿酬有什么区别？</summary>
+          <div class="faq-content">
+            <p>固定稿酬是完成约定交付即可获得固定金额；CPA 依照特定有效行为（如注册、下载）结算；CPS 按成交额或销售额分成。如品牌把固定稿酬口头称作“纯 CPA”，请务必在合同中核实真实结算条款。</p>
+          </div>
+        </details>
+        <details>
+          <summary>我的账号数据会被上传或保存吗？</summary>
+          <div class="faq-content">
+            <p>不会。本工具采用纯前端 HTML / CSS / JavaScript 本地运行，不含第三方脚本、分析 SDK、Cookie、Local Storage 或任何网络请求，刷新即清空。</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <span class="mono">CREATOR RATE LAB</span>
+      <span>请结合真实商单经验校准参数</span>
+    </footer>
+  </div>
+
+  <!-- 移动端便捷底栏：小屏实时看价与快速定位小票 -->
+  <div class="mobile-dock" aria-label="快捷报价预览">
+    <div class="mobile-dock-price">
+      <small>建议对外开价</small>
+      <strong id="mobileOpening" class="mono">¥1,200</strong>
+    </div>
+    <a href="#receiptPanel" class="btn btn-ink mobile-dock-btn">查看报价单</a>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
